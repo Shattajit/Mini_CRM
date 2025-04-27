@@ -1,0 +1,54 @@
+erDiagram
+    USER ||--o{ CLIENT : "1:N"
+    USER ||--o{ REMINDER : "1:N"
+    CLIENT ||--o{ PROJECT : "1:N"
+    CLIENT ||--o{ INTERACTION : "1:N"
+    PROJECT ||--o{ INTERACTION : "1:N"
+    PROJECT ||--o{ REMINDER : "1:N"
+
+    USER {
+        int id PK
+        string name
+        string email
+        string password_hash
+        datetime created_at
+    }
+
+    CLIENT {
+        int id PK
+        int user_id FK
+        string name
+        string email
+        string phone
+        string company NULL
+        string notes NULL
+    }
+
+    PROJECT {
+        int id PK
+        int client_id FK
+        string title
+        decimal budget
+        date deadline
+        enum status
+    }
+
+    INTERACTION {
+        int id PK
+        int client_id FK
+        int project_id FK NULL
+        date date
+        enum type
+        string notes
+    }
+
+    REMINDER {
+        int id PK
+        int user_id FK
+        int client_id FK NULL
+        int project_id FK NULL
+        string title
+        string notes
+        date due_date
+        bool is_completed
+    }
