@@ -1,0 +1,78 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}
+
+model Client {
+  id             String           @id @default(cuid())
+  name           String
+  email          String           @unique
+  phone          String
+  company        String?
+  notes          String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  projects       Project[]
+  InteractionLog InteractionLog[]
+  reminders      Reminder[]       // Added for Reminder relation
+}
+
+model Project {
+  id             String           @id @default(uuid())
+  title          String
+  budget         Float
+  deadline       DateTime
+  status         String
+  clientId       String
+  client         Client           @relation(fields: [clientId], references: [id])
+  createdAt      DateTime         @default(now())
+  InteractionLog InteractionLog[]
+  reminders      Reminder[]       // Added for Reminder relation
+}
+
+model InteractionLog {
+  id              String    @id @default(uuid())
+  date            DateTime  @default(now())
+  interactionType String
+  notes           String?
+  clientId        String
+  projectId       String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  client          Client    @relation(fields: [clientId], references: [id])
+  project         Project?  @relation(fields: [projectId], references: [id])
+
+  @@index([clientId])
+  @@index([projectId])
+}
+
+model Reminder {
+  id          String   @id @default(uuid())
+  title       String
+  description String?
+  dueDate     DateTime
+  isCompleted Boolean  @default(false)
+  clientId    String?
+  projectId   String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  client      Client?  @relation(fields: [clientId], references: [id])
+  project     Project? @relation(fields: [projectId], references: [id])
+
+  @@index([clientId])
+  @@index([projectId])
+}
